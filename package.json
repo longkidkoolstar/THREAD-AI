@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=\"--no-deprecation\" tsx watch src/server.ts",
+    "dev:debug": "cross-env DEBUG=vite:* NODE_OPTIONS=\"--no-deprecation\" tsx watch src/server.ts",
+    "dev:log": "cross-env DEBUG=vite:* NODE_OPTIONS=\"--no-deprecation\" tsx src/server.ts > debug.log 2>&1",
     "build": "vite build",
     "start": "cross-env NODE_ENV=production NODE_OPTIONS=\"--no-deprecation\" tsx src/server.ts",
     "lint": "eslint ."

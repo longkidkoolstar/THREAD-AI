@@ -1,0 +1,49 @@
+{
+  "name": "thread-ai",
+  "version": "1.0.0",
+  "description": "Unified React + Node.js AI Chat Application",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=\"--no-deprecation\" tsx watch src/server.ts",
+    "build": "vite build",
+    "start": "cross-env NODE_ENV=production NODE_OPTIONS=\"--no-deprecation\" tsx src/server.ts",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "lucide-react": "^0.378.0",
+    "multer": "1.4.5-lts.1",
+    "openai": "^4.47.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "react-syntax-highlighter": "^16.1.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "tsx": "^4.10.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vite-express": "^0.16.0"
+  }
+}

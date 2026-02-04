@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-zinc-950 text-zinc-100 antialiased font-sans selection:bg-blue-500/30;
+  }
+}
+
+@layer utilities {
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-zinc-800 rounded-full hover:bg-zinc-700;
+  }
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-semibold tracking-tight;
+}

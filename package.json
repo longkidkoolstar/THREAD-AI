@@ -4,7 +4,7 @@
   "description": "Unified React + Node.js AI Chat Application",
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=\"--no-deprecation\" tsx watch src/server.ts",
+    "dev": "vite",
     "dev:debug": "cross-env DEBUG=vite:* NODE_OPTIONS=\"--no-deprecation\" tsx watch src/server.ts",
     "dev:log": "cross-env DEBUG=vite:* NODE_OPTIONS=\"--no-deprecation\" tsx src/server.ts > debug.log 2>&1",
     "build": "vite build",

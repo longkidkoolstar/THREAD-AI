@@ -12,6 +12,7 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled }) => {
     const [isListening, setIsListening] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const recognitionRef = useRef<any>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,14 +62,14 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled }) => {
     };
 
     const toggleSpeech = () => {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            alert("Speech recognition is not supported in this browser.");
+        if (isListening) {
+            recognitionRef.current?.stop();
             return;
         }
 
-        if (isListening) {
-            setIsListening(false);
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Speech recognition is not supported in this browser.");
             return;
         }
 
@@ -78,8 +79,13 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled }) => {
         recognition.maxAlternatives = 1;
 
         recognition.onstart = () => setIsListening(true);
-        recognition.onend = () => setIsListening(false);
+        recognition.onend = () => {
+            setIsListening(false);
+            recognitionRef.current = null;
+        };
         recognition.onerror = (event: any) => {
+            // Ignore aborted error as it often happens when stopping manually
+            if (event.error === 'aborted') return;
             console.error("Speech error", event.error);
             setIsListening(false);
         };
@@ -88,6 +94,7 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled }) => {
             setText(prev => prev + (prev ? ' ' : '') + transcript);
         };
 
+        recognitionRef.current = recognition;
         recognition.start();
     };
 

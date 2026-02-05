@@ -19,5 +19,8 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api', apiRouter);
 
+import { Request, Response } from 'express';
 // Export for Vercel Serverless Function
-export default app;
+export default (req: Request, res: Response) => {
+    return app(req, res);
+};

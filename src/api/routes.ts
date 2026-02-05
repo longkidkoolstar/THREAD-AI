@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { handleChat } from './chat';
+import { handleTitle } from './title';
 import multer from 'multer';
 
 const upload = multer({ storage: multer.memoryStorage() });
 export const apiRouter = Router();
 
 apiRouter.post('/chat', handleChat);
+apiRouter.post('/title', handleTitle);
 apiRouter.post('/upload', upload.single('file'), (req, res) => {
     // In a real app, we would process/store the file here
     // For now, we just return the metadata so the UI can "see" it

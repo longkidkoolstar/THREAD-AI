@@ -4,7 +4,8 @@
   "description": "Unified React + Node.js AI Chat Application",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "cross-env NODE_OPTIONS=\"--no-deprecation\" tsx watch --clear-screen=false --exclude \"dist/**\" --exclude \".vite/**\" --exclude \"node_modules/**\" --exclude \"**/*.timestamp-*\" src/server.ts",
+    "dev:frontend": "vite",
     "dev:debug": "cross-env DEBUG=vite:* NODE_OPTIONS=\"--no-deprecation\" tsx watch src/server.ts",
     "dev:log": "cross-env DEBUG=vite:* NODE_OPTIONS=\"--no-deprecation\" tsx src/server.ts > debug.log 2>&1",
     "build": "vite build",

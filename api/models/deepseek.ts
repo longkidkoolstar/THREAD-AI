@@ -24,12 +24,6 @@ export class DeepSeekAdapter implements ModelAdapter {
             });
 
             for await (const chunk of stream) {
-                // Check for reasoning content (DeepSeek R1 specific)
-                // Note: The OpenAI SDK might put this in a different field depending on compatibility,
-                // but usually it's in delta.content or a specific reasoning_content field if using raw API.
-                // Since we are using OpenAI SDK compatibility layer, DeepSeek maps reasoning_content to 'reasoning_content'
-                // We need to cast chunk to any to access potentially non-standard fields or just check choices.
-                
                 const delta = chunk.choices[0]?.delta as any;
                 
                 if (delta?.reasoning_content) {

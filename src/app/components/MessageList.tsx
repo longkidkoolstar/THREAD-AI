@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
-import { Message } from '../hooks/useChat';
+import { Message } from '../hooks/useChat.js';
 import ReactMarkdown from 'react-markdown';
-import { ReasoningPanel } from './ReasoningPanel';
-import { CodeBlock } from './CodeBlock';
+import { ReasoningPanel } from './ReasoningPanel.js';
+import { CodeBlock } from './CodeBlock.js';
 import { User, Bot, FileText, ArrowDown } from 'lucide-react';
 
 interface Props {

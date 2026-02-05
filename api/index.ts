@@ -1,13 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import { apiRouter } from '../src/api/routes';
+import { apiRouter } from './routes.js';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
     res.json({ 
         status: 'ok', 
         message: 'Thread AI API is running',

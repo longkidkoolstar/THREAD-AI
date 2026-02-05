@@ -18,7 +18,6 @@ export const models: ModelConfig[] = [
     }
 ];
 
-// Singleton instances to reuse connections if needed
 let deepseekAdapter: DeepSeekAdapter | null = null;
 
 export function getModelAdapter(modelId: string): ModelAdapter | null {

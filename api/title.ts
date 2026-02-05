@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getModelAdapter } from '../models/index.js';
-import { ChatMessage } from '../models/types.js';
+import { getModelAdapter } from './models/index.js';
+import { ChatMessage } from './models/types.js';
 
 export const handleTitle = async (req: Request, res: Response) => {
     const { model, messages } = req.body;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, Plus, Trash2, Search, ChevronLeft, ChevronRight, Menu } from 'lucide-react';
-import { ChatSession } from '../hooks/useChat';
+import { ChatSession } from '../hooks/useChat.js';
 
 interface ChatSidebarProps {
     chats: Record<string, ChatSession>;

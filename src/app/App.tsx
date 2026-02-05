@@ -1,8 +1,8 @@
-import { useChat } from './hooks/useChat';
-import { MessageList } from './components/MessageList';
-import { MessageInput } from './components/MessageInput';
-import { ModelSelector } from './components/ModelSelector';
-import { ChatSidebar } from './components/ChatSidebar';
+import { useChat } from './hooks/useChat.js';
+import { MessageList } from './components/MessageList.js';
+import { MessageInput } from './components/MessageInput.js';
+import { ModelSelector } from './components/ModelSelector.js';
+import { ChatSidebar } from './components/ChatSidebar.js';
 import { Bot, Sparkles } from 'lucide-react';
 
 function App() {

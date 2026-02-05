@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getModelAdapter } from '../models/index.js';
+import { getModelAdapter } from './models/index.js';
 
 export const handleChat = async (req: Request, res: Response) => {
     const { model, messages } = req.body;

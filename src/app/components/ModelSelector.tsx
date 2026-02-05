@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Box, Check } from 'lucide-react';
-import { models } from '../../models';
+import { models } from '../../models/index.js';
 
 interface Props {
     currentModel: string;

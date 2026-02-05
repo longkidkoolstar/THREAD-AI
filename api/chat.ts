@@ -28,9 +28,16 @@ export const handleChat = async (req: Request, res: Response) => {
         console.error('Chat error:', error);
         // If headers are already sent, we can't send a JSON error
         if (!res.headersSent) {
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({ 
+                error: 'Internal server error', 
+                details: error instanceof Error ? error.message : String(error)
+            });
         } else {
-            res.write(`data: ${JSON.stringify({ type: 'error', text: 'Internal server error' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ 
+                type: 'error', 
+                text: 'Internal server error',
+                details: error instanceof Error ? error.message : String(error)
+            })}\n\n`);
             res.end();
         }
     }

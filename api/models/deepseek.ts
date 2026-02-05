@@ -16,6 +16,7 @@ export class DeepSeekAdapter implements ModelAdapter {
     }
 
     async *chat(request: CompletionRequest): AsyncGenerator<StreamChunk, void, unknown> {
+        console.log(`[DeepSeek] Starting chat request for model: ${request.model}`);
         try {
             const stream = await this.client.chat.completions.create({
                 model: request.model,
@@ -36,6 +37,14 @@ export class DeepSeekAdapter implements ModelAdapter {
             }
         } catch (error) {
             console.error('DeepSeek API Error:', error);
+            if (error instanceof OpenAI.APIError) {
+                console.error('DeepSeek API Error Details:', {
+                    status: error.status,
+                    message: error.message,
+                    code: error.code,
+                    type: error.type
+                });
+            }
             throw error;
         }
     }

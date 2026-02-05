@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'lz-string': path.resolve(__dirname, 'node_modules/lz-string/libs/lz-string.js'),
     },
   },
   build: {

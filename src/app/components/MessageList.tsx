@@ -12,30 +12,11 @@ interface Props {
 
 export const MessageList: React.FC<Props> = ({ messages, isLoading }) => {
     const bottomRef = useRef<HTMLDivElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null); // Use a container ref if MessageList is scrollable or use window
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [autoScroll, setAutoScroll] = useState(true);
 
     // Detect user scroll to disable auto-scroll
     useEffect(() => {
-        const handleScroll = () => {
-            // If user scrolls up, disable autoScroll
-            if (!bottomRef.current) return;
-            
-            // This logic depends on where the scroll event is attached. 
-            // Assuming this component is inside a scrollable parent (in App.tsx)
-            // Ideally we'd attach this to that parent. 
-            // For now, let's assume the parent passes a ref or we attach to window if global scroll.
-            // But App.tsx has: <div className="flex-1 overflow-y-auto ..."> ... <MessageList /> ... </div>
-            // We need access to that scrollable container to detect scroll position.
-            // Since we can't easily modify App.tsx structure from here without ref forwarding,
-            // We'll rely on a simplified approach:
-            // If the user is near bottom, autoScroll = true. Else false.
-        };
-        
-        // Note: Actual scroll listener implementation is best done in the parent or by finding the scroll parent.
-        // For simplicity in this "Senior Pair Programmer" role, let's implement the button logic.
-        
         // Finding the scrollable parent (closest .overflow-y-auto)
         const scrollParent = bottomRef.current?.closest('.overflow-y-auto');
         if (scrollParent) {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useChat } from './hooks/useChat';
 import { MessageList } from './components/MessageList';
 import { MessageInput } from './components/MessageInput';

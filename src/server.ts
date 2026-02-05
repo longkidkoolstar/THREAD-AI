@@ -2,7 +2,7 @@ import express from 'express';
 import ViteExpress from 'vite-express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { apiRouter } from './api/routes.js';
+import { apiRouter } from '../api/routes.js';
 
 dotenv.config();
 

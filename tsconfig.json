@@ -8,9 +8,6 @@
 
     /* Bundler mode */
     "baseUrl": ".",
-    "paths": {
-      "*": ["./api/*"]
-    },
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "isolatedModules": true,

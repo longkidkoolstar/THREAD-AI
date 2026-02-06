@@ -4,7 +4,7 @@ import { ChatMessage } from './models/types.js';
 
 export const handleTitle = async (req: Request, res: Response) => {
     const { model, messages } = req.body;
-    
+
     try {
         const adapter = getModelAdapter(model);
         if (!adapter) {
@@ -15,17 +15,17 @@ export const handleTitle = async (req: Request, res: Response) => {
         // We only take the first few messages to avoid context overflow and save tokens, 
         // as we only need the initial topic.
         const contextMessages = messages.slice(0, 4);
-        
+
         const titlePrompt: ChatMessage[] = [
             ...contextMessages,
-            { 
-                role: 'user', 
-                content: 'Generate a short, concise title (max 5 words) for this conversation based on the initial messages. Do not use quotes, prefixes, or "Title:". Just the title text itself.' 
+            {
+                role: 'user',
+                content: 'Generate a short, concise title (max 5 words) for this conversation based on the initial messages. Do not use quotes, prefixes, or "Title:". Just the title text itself.'
             }
         ];
 
         const stream = adapter.chat({ model, messages: titlePrompt, stream: false });
-        
+
         let title = '';
         for await (const chunk of stream) {
             if (chunk.type === 'content') {
@@ -43,3 +43,5 @@ export const handleTitle = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export default handleTitle;

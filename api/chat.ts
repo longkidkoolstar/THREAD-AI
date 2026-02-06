@@ -3,7 +3,7 @@ import { getModelAdapter } from './models/index.js';
 
 export const handleChat = async (req: Request, res: Response) => {
     const { model, messages } = req.body;
-    
+
     try {
         const adapter = getModelAdapter(model);
         if (!adapter) {
@@ -20,7 +20,7 @@ export const handleChat = async (req: Request, res: Response) => {
         for await (const chunk of stream) {
             res.write(`data: ${JSON.stringify(chunk)}\n\n`);
         }
-        
+
         res.write('data: [DONE]\n\n');
         res.end();
 
@@ -28,13 +28,13 @@ export const handleChat = async (req: Request, res: Response) => {
         console.error('Chat error:', error);
         // If headers are already sent, we can't send a JSON error
         if (!res.headersSent) {
-            res.status(500).json({ 
-                error: 'Internal server error', 
+            res.status(500).json({
+                error: 'Internal server error',
                 details: error instanceof Error ? error.message : String(error)
             });
         } else {
-            res.write(`data: ${JSON.stringify({ 
-                type: 'error', 
+            res.write(`data: ${JSON.stringify({
+                type: 'error',
                 text: 'Internal server error',
                 details: error instanceof Error ? error.message : String(error)
             })}\n\n`);
@@ -42,3 +42,5 @@ export const handleChat = async (req: Request, res: Response) => {
         }
     }
 };
+
+export default handleChat;

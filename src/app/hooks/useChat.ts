@@ -223,14 +223,11 @@ export function useChat() {
 
     const sendMessage = async (content: string, files: File[], isFromQueue = false) => {
         if (isLoading && !isFromQueue) {
-            if (autoSendEnabled) {
-                setQueuedMessages(prev => [...prev, {
-                    id: uuidv4(),
-                    content,
-                    files
-                }]);
-                return;
-            }
+            setQueuedMessages(prev => [...prev, {
+                id: uuidv4(),
+                content,
+                files
+            }]);
             return;
         }
 

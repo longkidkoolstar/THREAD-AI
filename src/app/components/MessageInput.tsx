@@ -154,8 +154,8 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
             )}
 
             <div className={`relative flex items-center bg-zinc-900/90 backdrop-blur-xl rounded-2xl border transition-all shadow-xl ${isDragging
-                    ? 'border-blue-500 ring-2 ring-blue-500/20 bg-zinc-800/90'
-                    : 'border-zinc-800 focus-within:border-zinc-700'
+                ? 'border-blue-500 ring-2 ring-blue-500/20 bg-zinc-800/90'
+                : 'border-zinc-800 focus-within:border-zinc-700'
                 }`}>
                 {isDragging && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-zinc-900/90 z-20 backdrop-blur-sm border-2 border-dashed border-blue-500 animate-in fade-in duration-200">
@@ -205,22 +205,27 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
 
                 <div className="p-2 pr-2 z-10">
                     <button
-                        type={isLoading ? "button" : "submit"}
+                        type={isLoading && (!text.trim() && files.length === 0) ? "button" : "submit"}
                         onClick={(e) => {
-                            if (isLoading && onStop) {
+                            const hasContent = text.trim() || files.length > 0;
+                            if (isLoading && !hasContent && onStop) {
                                 e.preventDefault();
                                 onStop();
                             }
                         }}
-                        className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLoading
+                        className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLoading && (!text.trim() && files.length === 0)
                                 ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20'
                                 : ((!text.trim() && files.length === 0) || disabled)
                                     ? 'text-zinc-600 bg-zinc-800 cursor-not-allowed'
                                     : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20'
                             }`}
-                        disabled={!isLoading && ((!text.trim() && files.length === 0) || disabled)}
+                        disabled={
+                            isLoading
+                                ? false
+                                : (!text.trim() && files.length === 0) || disabled
+                        }
                     >
-                        {isLoading ? <Square className="w-4 h-4 fill-current" /> : <Send className="w-4 h-4" />}
+                        {isLoading && (!text.trim() && files.length === 0) ? <Square className="w-4 h-4 fill-current" /> : <Send className="w-4 h-4" />}
                     </button>
                 </div>
             </div>

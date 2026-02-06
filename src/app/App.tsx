@@ -77,7 +77,7 @@ function App() {
                         <div className="max-w-4xl mx-auto">
                             <MessageInput
                                 onSend={sendMessage}
-                                disabled={isLoading && !autoSendEnabled}
+                                disabled={false}
                                 queuedMessages={queuedMessages}
                                 onRemoveQueuedMessage={removeQueuedMessage}
                                 onStop={stopGeneration}

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Mic, X, Upload, Clock } from 'lucide-react';
+import { Send, Paperclip, Mic, X, Upload, Clock, Square } from 'lucide-react';
 import { QueuedMessage } from '../hooks/useChat.js';
 
 interface Props {
@@ -7,9 +7,11 @@ interface Props {
     disabled: boolean;
     queuedMessages?: QueuedMessage[];
     onRemoveQueuedMessage?: (id: string) => void;
+    onStop?: () => void;
+    isLoading?: boolean;
 }
 
-export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages = [], onRemoveQueuedMessage }) => {
+export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages = [], onRemoveQueuedMessage, onStop, isLoading }) => {
     const [text, setText] = useState('');
     const [files, setFiles] = useState<File[]>([]);
     const [isListening, setIsListening] = useState(false);
@@ -44,12 +46,12 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         // Only set dragging to false if we are leaving the main container
         if (e.currentTarget.contains(e.relatedTarget as Node)) {
             return;
         }
-        
+
         setIsDragging(false);
     };
 
@@ -102,15 +104,15 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
     };
 
     return (
-        <form 
-            onSubmit={handleSubmit} 
+        <form
+            onSubmit={handleSubmit}
             className="relative group"
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
             <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
-            
+
             {queuedMessages.length > 0 && (
                 <div className="flex flex-col gap-2 mb-3 relative z-10 px-1">
                     {queuedMessages.map((msg) => (
@@ -125,9 +127,9 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
                                 )}
                             </div>
                             {onRemoveQueuedMessage && (
-                                <button 
-                                    type="button" 
-                                    onClick={() => onRemoveQueuedMessage(msg.id)} 
+                                <button
+                                    type="button"
+                                    onClick={() => onRemoveQueuedMessage(msg.id)}
                                     className="hover:text-white transition-colors p-1 hover:bg-zinc-700 rounded-lg"
                                 >
                                     <X className="w-3.5 h-3.5" />
@@ -150,12 +152,11 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
                     ))}
                 </div>
             )}
-            
-            <div className={`relative flex items-center bg-zinc-900/90 backdrop-blur-xl rounded-2xl border transition-all shadow-xl ${
-                isDragging 
-                    ? 'border-blue-500 ring-2 ring-blue-500/20 bg-zinc-800/90' 
+
+            <div className={`relative flex items-center bg-zinc-900/90 backdrop-blur-xl rounded-2xl border transition-all shadow-xl ${isDragging
+                    ? 'border-blue-500 ring-2 ring-blue-500/20 bg-zinc-800/90'
                     : 'border-zinc-800 focus-within:border-zinc-700'
-            }`}>
+                }`}>
                 {isDragging && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-zinc-900/90 z-20 backdrop-blur-sm border-2 border-dashed border-blue-500 animate-in fade-in duration-200">
                         <div className="flex flex-col items-center text-blue-400">
@@ -165,7 +166,7 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
                     </div>
                 )}
 
-                <button 
+                <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="p-4 text-zinc-500 hover:text-zinc-300 transition-colors"
@@ -174,11 +175,11 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
                 >
                     <Paperclip className="w-5 h-5" />
                 </button>
-                <input 
-                    type="file" 
-                    multiple 
-                    ref={fileInputRef} 
-                    className="hidden" 
+                <input
+                    type="file"
+                    multiple
+                    ref={fileInputRef}
+                    className="hidden"
                     onChange={handleFileSelect}
                     accept=".txt,.json,.md"
                 />
@@ -192,7 +193,7 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
                     disabled={disabled}
                 />
 
-                <button 
+                <button
                     type="button"
                     onClick={toggleSpeech}
                     className={`p-4 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-zinc-500 hover:text-zinc-300'}`}
@@ -203,16 +204,23 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
                 </button>
 
                 <div className="p-2 pr-2 z-10">
-                    <button 
-                        type="submit"
-                        className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${
-                            (!text.trim() && files.length === 0) || disabled 
-                            ? 'text-zinc-600 bg-zinc-800 cursor-not-allowed' 
-                            : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20'
-                        }`}
-                        disabled={(!text.trim() && files.length === 0) || disabled}
+                    <button
+                        type={isLoading ? "button" : "submit"}
+                        onClick={(e) => {
+                            if (isLoading && onStop) {
+                                e.preventDefault();
+                                onStop();
+                            }
+                        }}
+                        className={`p-2.5 rounded-xl transition-all flex items-center justify-center ${isLoading
+                                ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20'
+                                : ((!text.trim() && files.length === 0) || disabled)
+                                    ? 'text-zinc-600 bg-zinc-800 cursor-not-allowed'
+                                    : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20'
+                            }`}
+                        disabled={!isLoading && ((!text.trim() && files.length === 0) || disabled)}
                     >
-                        <Send className="w-4 h-4" />
+                        {isLoading ? <Square className="w-4 h-4 fill-current" /> : <Send className="w-4 h-4" />}
                     </button>
                 </div>
             </div>

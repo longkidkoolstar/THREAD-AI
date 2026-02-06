@@ -35,7 +35,13 @@ export function useChat() {
     const [chats, setChats] = useState<Record<string, ChatSession>>({});
     const [currentChatId, setCurrentChatId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentModel, setCurrentModel] = useState('deepseek-chat');
+    // Initialize model from local storage or default to deepseek-chat
+    const [currentModel, setCurrentModel] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('thread-ai-last-model') || 'deepseek-chat';
+        }
+        return 'deepseek-chat';
+    });
     const [autoSendEnabled, setAutoSendEnabled] = useState(false);
     const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
     const abortControllerRef = useRef<AbortController | null>(null);
@@ -53,12 +59,58 @@ export function useChat() {
         if (savedAutoSend) {
             setAutoSendEnabled(JSON.parse(savedAutoSend));
         }
+
+        // Ensure currentModel is consistent with localStorage on mount (double check)
+        const savedModel = localStorage.getItem('thread-ai-last-model');
+        if (savedModel && savedModel !== currentModel) {
+            // If we're not loading a specific chat that overrides this later (in the chats useEffect),
+            // this ensures we start with the right model. 
+            // However, the chats loading effect usually runs after or during this.
+            // We'll let the initial state take care of it mostly.
+        }
     }, []);
 
     // Save autoSendEnabled to local storage
     useEffect(() => {
         localStorage.setItem('thread-ai-auto-send', JSON.stringify(autoSendEnabled));
     }, [autoSendEnabled]);
+
+    const updateModel = useCallback((model: string) => {
+        setCurrentModel(model);
+        localStorage.setItem('thread-ai-last-model', model);
+
+        if (currentChatId) {
+            setChats(prev => {
+                const chat = prev[currentChatId];
+                if (!chat) return prev;
+                return {
+                    ...prev,
+                    [currentChatId]: {
+                        ...chat,
+                        model: model
+                    }
+                };
+            });
+        }
+    }, [currentChatId]);
+
+    const createNewChat = useCallback(() => {
+        const newId = uuidv4();
+        // Use the current model preference or fallback
+        const defaultModel = localStorage.getItem('thread-ai-last-model') || 'deepseek-chat';
+
+        const newChat: ChatSession = {
+            id: newId,
+            title: 'New Chat',
+            messages: [],
+            createdAt: Date.now(),
+            model: defaultModel
+        };
+        setChats(prev => ({ ...prev, [newId]: newChat }));
+        setCurrentChatId(newId);
+        setCurrentModel(defaultModel);
+        return newId;
+    }, []);
 
     // Load chats from local storage
     useEffect(() => {
@@ -85,7 +137,7 @@ export function useChat() {
         } else {
             createNewChat();
         }
-    }, []);
+    }, []); // eslint-disable-next-line react-hooks/exhaustive-deps
 
     // Save chats to local storage
     useEffect(() => {
@@ -138,21 +190,6 @@ export function useChat() {
         }
     }, [currentChatId, chats, isLoading]);
 
-    const createNewChat = useCallback(() => {
-        const newId = uuidv4();
-        const newChat: ChatSession = {
-            id: newId,
-            title: 'New Chat',
-            messages: [],
-            createdAt: Date.now(),
-            model: 'deepseek-chat'
-        };
-        setChats(prev => ({ ...prev, [newId]: newChat }));
-        setCurrentChatId(newId);
-        setCurrentModel('deepseek-chat');
-        return newId;
-    }, []);
-
     const deleteChat = useCallback((id: string) => {
         setChats(prev => {
             const newChats = { ...prev };
@@ -170,23 +207,6 @@ export function useChat() {
             setCurrentModel(chats[id].model);
         }
     }, [chats]);
-
-    const updateModel = useCallback((model: string) => {
-        setCurrentModel(model);
-        if (currentChatId) {
-            setChats(prev => {
-                const chat = prev[currentChatId];
-                if (!chat) return prev;
-                return {
-                    ...prev,
-                    [currentChatId]: {
-                        ...chat,
-                        model: model
-                    }
-                };
-            });
-        }
-    }, [currentChatId]);
 
     // Helper to update messages for current chat
     const updateMessages = (updateFn: (prev: Message[]) => Message[]) => {
@@ -406,3 +426,4 @@ export function useChat() {
         stopGeneration
     };
 }
+

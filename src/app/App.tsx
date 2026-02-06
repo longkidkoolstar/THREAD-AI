@@ -16,7 +16,11 @@ function App() {
       currentChatId,
       createNewChat,
       deleteChat,
-      selectChat
+      selectChat,
+      autoSendEnabled,
+      setAutoSendEnabled,
+      queuedMessages,
+      removeQueuedMessage
   } = useChat();
 
   return (
@@ -27,6 +31,8 @@ function App() {
           onSelectChat={selectChat}
           onDeleteChat={deleteChat}
           onNewChat={createNewChat}
+          autoSendEnabled={autoSendEnabled}
+          setAutoSendEnabled={setAutoSendEnabled}
       />
       
       <div className="flex-1 flex flex-col min-w-0">
@@ -68,7 +74,12 @@ function App() {
             {/* Input Area */}
             <div className="p-4 md:p-6 bg-transparent">
                 <div className="max-w-4xl mx-auto">
-                    <MessageInput onSend={sendMessage} disabled={isLoading} />
+                    <MessageInput 
+                        onSend={sendMessage} 
+                        disabled={isLoading && !autoSendEnabled}
+                        queuedMessages={queuedMessages}
+                        onRemoveQueuedMessage={removeQueuedMessage}
+                    />
                     <p className="text-center text-xs text-zinc-600 mt-3">
                         AI can make mistakes. Please verify important information.
                     </p>

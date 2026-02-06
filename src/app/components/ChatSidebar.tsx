@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { MessageSquare, Plus, Trash2, Search, ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import { MessageSquare, Plus, Trash2, Search, ChevronLeft, ChevronRight, Menu, Settings } from 'lucide-react';
 import { ChatSession } from '../hooks/useChat.js';
+import { SettingsModal } from './SettingsModal.js';
 
 interface ChatSidebarProps {
     chats: Record<string, ChatSession>;
@@ -8,12 +9,15 @@ interface ChatSidebarProps {
     onSelectChat: (id: string) => void;
     onDeleteChat: (id: string) => void;
     onNewChat: () => void;
+    autoSendEnabled: boolean;
+    setAutoSendEnabled: (enabled: boolean) => void;
 }
 
-export function ChatSidebar({ chats, currentChatId, onSelectChat, onDeleteChat, onNewChat }: ChatSidebarProps) {
+export function ChatSidebar({ chats, currentChatId, onSelectChat, onDeleteChat, onNewChat, autoSendEnabled, setAutoSendEnabled }: ChatSidebarProps) {
     const [isOpen, setIsOpen] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [chatToDelete, setChatToDelete] = useState<string | null>(null);
+    const [showSettings, setShowSettings] = useState(false);
 
     const sortedChats = Object.values(chats)
         .sort((a, b) => b.createdAt - a.createdAt)
@@ -37,6 +41,14 @@ export function ChatSidebar({ chats, currentChatId, onSelectChat, onDeleteChat, 
 
     return (
         <>
+            {/* Settings Modal */}
+            <SettingsModal 
+                isOpen={showSettings} 
+                onClose={() => setShowSettings(false)} 
+                autoSendEnabled={autoSendEnabled}
+                setAutoSendEnabled={setAutoSendEnabled}
+            />
+
             {/* Delete Confirmation Modal */}
             {chatToDelete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -152,6 +164,17 @@ export function ChatSidebar({ chats, currentChatId, onSelectChat, onDeleteChat, 
                         </div>
                     )}
                 </div>
+
+                {/* Footer Settings */}
+                <div className="p-4 border-t border-zinc-900/50">
+                    <button 
+                        onClick={() => setShowSettings(true)}
+                        className="flex items-center gap-3 w-full p-2 hover:bg-zinc-900 rounded-lg text-zinc-400 hover:text-zinc-200 transition-colors"
+                    >
+                        <Settings className="w-4 h-4" />
+                        <span className="text-sm font-medium">Settings</span>
+                    </button>
+                </div>
             </div>
 
             {/* Expand Button (when closed) */}
@@ -168,6 +191,12 @@ export function ChatSidebar({ chats, currentChatId, onSelectChat, onDeleteChat, 
                         className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg"
                     >
                         <Plus className="w-4 h-4" />
+                    </button>
+                    <button 
+                        onClick={() => setShowSettings(true)}
+                        className="p-2 hover:bg-zinc-900 rounded-lg text-zinc-400"
+                    >
+                        <Settings className="w-4 h-4" />
                     </button>
                  </div>
             </div>

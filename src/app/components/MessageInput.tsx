@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, Mic, X, Upload } from 'lucide-react';
+import { Send, Paperclip, Mic, X, Upload, Clock } from 'lucide-react';
+import { QueuedMessage } from '../hooks/useChat.js';
 
 interface Props {
     onSend: (content: string, files: File[]) => void;
     disabled: boolean;
+    queuedMessages?: QueuedMessage[];
+    onRemoveQueuedMessage?: (id: string) => void;
 }
 
-export const MessageInput: React.FC<Props> = ({ onSend, disabled }) => {
+export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages = [], onRemoveQueuedMessage }) => {
     const [text, setText] = useState('');
     const [files, setFiles] = useState<File[]>([]);
     const [isListening, setIsListening] = useState(false);
@@ -108,6 +111,33 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled }) => {
         >
             <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
             
+            {queuedMessages.length > 0 && (
+                <div className="flex flex-col gap-2 mb-3 relative z-10 px-1">
+                    {queuedMessages.map((msg) => (
+                        <div key={msg.id} className="flex items-center gap-3 bg-zinc-800/80 text-sm px-4 py-2 rounded-xl text-zinc-300 border border-zinc-700 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                            <Clock className="w-4 h-4 text-blue-400 animate-pulse" />
+                            <div className="flex-1 truncate">
+                                <span className="font-medium text-zinc-100">Queued:</span> {msg.content}
+                                {msg.files.length > 0 && (
+                                    <span className="ml-2 text-xs text-zinc-500">
+                                        (+{msg.files.length} file{msg.files.length > 1 ? 's' : ''})
+                                    </span>
+                                )}
+                            </div>
+                            {onRemoveQueuedMessage && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => onRemoveQueuedMessage(msg.id)} 
+                                    className="hover:text-white transition-colors p-1 hover:bg-zinc-700 rounded-lg"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {files.length > 0 && (
                 <div className="flex gap-2 mb-3 flex-wrap relative z-10 px-1">
                     {files.map((f, i) => (

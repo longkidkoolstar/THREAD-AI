@@ -15,6 +15,12 @@ export interface Message {
   files?: MessageFile[];
 }
 
+export interface QueuedMessage {
+    id: string;
+    content: string;
+    files: File[];
+}
+
 export interface ChatSession {
     id: string;
     title: string;
@@ -30,6 +36,21 @@ export function useChat() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentModel, setCurrentModel] = useState('deepseek-chat');
+  const [autoSendEnabled, setAutoSendEnabled] = useState(false);
+  const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
+
+  // Load autoSendEnabled from local storage
+  useEffect(() => {
+    const savedAutoSend = localStorage.getItem('thread-ai-auto-send');
+    if (savedAutoSend) {
+        setAutoSendEnabled(JSON.parse(savedAutoSend));
+    }
+  }, []);
+
+  // Save autoSendEnabled to local storage
+  useEffect(() => {
+    localStorage.setItem('thread-ai-auto-send', JSON.stringify(autoSendEnabled));
+  }, [autoSendEnabled]);
 
   // Load chats from local storage
   useEffect(() => {
@@ -192,7 +213,19 @@ export function useChat() {
 
   const messages = currentChatId && chats[currentChatId] ? chats[currentChatId].messages : [];
 
-  const sendMessage = async (content: string, files: File[]) => {
+  const sendMessage = async (content: string, files: File[], isFromQueue = false) => {
+    if (isLoading && !isFromQueue) {
+        if (autoSendEnabled) {
+            setQueuedMessages(prev => [...prev, {
+                id: uuidv4(),
+                content,
+                files
+            }]);
+            return;
+        }
+        return;
+    }
+
     // 1. Handle file uploads if any
     let fileContext = '';
     const attachedFiles: MessageFile[] = [];
@@ -325,6 +358,20 @@ export function useChat() {
     }
   };
 
+  const processQueue = useCallback(async () => {
+    if (queuedMessages.length === 0) return;
+
+    const nextMessage = queuedMessages[0];
+    setQueuedMessages(prev => prev.slice(1));
+    await sendMessage(nextMessage.content, nextMessage.files, true);
+  }, [queuedMessages]);
+
+  useEffect(() => {
+      if (!isLoading && queuedMessages.length > 0) {
+          processQueue();
+      }
+  }, [isLoading, queuedMessages, processQueue]);
+
   return { 
       messages, 
       isLoading, 
@@ -335,6 +382,10 @@ export function useChat() {
       currentChatId,
       createNewChat,
       deleteChat,
-      selectChat
+      selectChat,
+      autoSendEnabled,
+      setAutoSendEnabled,
+      queuedMessages,
+      removeQueuedMessage: (id: string) => setQueuedMessages(prev => prev.filter(m => m.id !== id))
   };
 }

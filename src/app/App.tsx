@@ -1,11 +1,13 @@
 import { useChat } from './hooks/useChat.js';
 import { MessageList } from './components/MessageList.js';
-import { MessageInput } from './components/MessageInput.js';
+import { MessageInput, MessageInputHandle } from './components/MessageInput.js';
 import { ModelSelector } from './components/ModelSelector.js';
 import { ChatSidebar } from './components/ChatSidebar.js';
 import { Bot, Sparkles } from 'lucide-react';
+import { useRef } from 'react';
 
 function App() {
+    const inputRef = useRef<MessageInputHandle>(null);
     const {
         messages,
         isLoading,
@@ -17,12 +19,24 @@ function App() {
         createNewChat,
         deleteChat,
         selectChat,
+        undoToMessage,
         autoSendEnabled,
         setAutoSendEnabled,
         queuedMessages,
         removeQueuedMessage,
         stopGeneration
     } = useChat();
+
+    const handleUndo = (messageIndex: number) => {
+        const msg = messages[messageIndex];
+        if (msg && msg.role === 'user') {
+            // Put text back in input
+            inputRef.current?.setText(msg.content);
+            
+            // Remove the message with fade animation
+            undoToMessage(messageIndex);
+        }
+    };
 
     return (
         <div className="flex h-screen overflow-hidden bg-zinc-950 text-zinc-100 font-sans">
@@ -68,7 +82,7 @@ function App() {
                                 </div>
                             </div>
                         ) : (
-                            <MessageList messages={messages} isLoading={isLoading} />
+                            <MessageList messages={messages} isLoading={isLoading} onUndo={handleUndo} />
                         )}
                     </div>
 
@@ -76,6 +90,7 @@ function App() {
                     <div className="p-4 md:p-6 bg-transparent">
                         <div className="max-w-4xl mx-auto">
                             <MessageInput
+                                ref={inputRef}
                                 onSend={sendMessage}
                                 disabled={false}
                                 queuedMessages={queuedMessages}

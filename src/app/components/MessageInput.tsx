@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Send, Paperclip, Mic, X, Upload, Clock, Square } from 'lucide-react';
 import { QueuedMessage } from '../hooks/useChat.js';
 
@@ -11,13 +11,21 @@ interface Props {
     isLoading?: boolean;
 }
 
-export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages = [], onRemoveQueuedMessage, onStop, isLoading }) => {
+export interface MessageInputHandle {
+    setText: (text: string) => void;
+}
+
+export const MessageInput = forwardRef<MessageInputHandle, Props>(({ onSend, disabled, queuedMessages = [], onRemoveQueuedMessage, onStop, isLoading }, ref) => {
     const [text, setText] = useState('');
     const [files, setFiles] = useState<File[]>([]);
     const [isListening, setIsListening] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const recognitionRef = useRef<any>(null);
+
+    useImperativeHandle(ref, () => ({
+        setText: (newText: string) => setText(newText)
+    }));
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -231,4 +239,6 @@ export const MessageInput: React.FC<Props> = ({ onSend, disabled, queuedMessages
             </div>
         </form>
     );
-};
+});
+
+MessageInput.displayName = 'MessageInput';

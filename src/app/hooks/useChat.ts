@@ -208,6 +208,27 @@ export function useChat() {
         }
     }, [chats]);
 
+    const undoToMessage = useCallback((messageIndex: number) => {
+        if (!currentChatId) return;
+
+        setChats(prev => {
+            const chat = prev[currentChatId];
+            if (!chat) return prev;
+
+            // Remove the message at messageIndex and everything after it
+            const newMessages = chat.messages.slice(0, messageIndex);
+
+            return {
+                ...prev,
+                [currentChatId]: {
+                    ...chat,
+                    messages: newMessages,
+                    createdAt: Date.now() // Update timestamp
+                }
+            };
+        });
+    }, [currentChatId]);
+
     // Helper to update messages for current chat
     const updateMessages = (updateFn: (prev: Message[]) => Message[]) => {
         if (!currentChatId) return;
@@ -419,6 +440,7 @@ export function useChat() {
         createNewChat,
         deleteChat,
         selectChat,
+        undoToMessage,
         autoSendEnabled,
         setAutoSendEnabled,
         queuedMessages,

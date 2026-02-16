@@ -1,7 +1,7 @@
 export interface ModelConfig {
   id: string;
   name: string;
-  provider: 'deepseek';
+  provider: 'deepseek' | 'kimi';
   supportsStreaming: boolean;
   supportsReasoning: boolean;
 }

@@ -1,5 +1,6 @@
 import { ModelAdapter, ModelConfig } from './types.js';
 import { DeepSeekAdapter } from './deepseek.js';
+import { KimiAdapter } from './kimi.js';
 
 export const models: ModelConfig[] = [
     {
@@ -15,11 +16,26 @@ export const models: ModelConfig[] = [
         provider: 'deepseek',
         supportsStreaming: true,
         supportsReasoning: true
+    },
+    {
+        id: 'kimi-k2.5',
+        name: 'Kimi K2.5 Thinking',
+        provider: 'kimi',
+        supportsStreaming: true,
+        supportsReasoning: true
+    },
+    {
+        id: 'kimi-k2-turbo-preview',
+        name: 'Kimi K2',
+        provider: 'kimi',
+        supportsStreaming: true,
+        supportsReasoning: false
     }
 ];
 
 // Singleton instances to reuse connections if needed
 let deepseekAdapter: DeepSeekAdapter | null = null;
+let kimiAdapter: KimiAdapter | null = null;
 
 export function getModelAdapter(modelId: string): ModelAdapter | null {
     const model = models.find(m => m.id === modelId);
@@ -30,6 +46,13 @@ export function getModelAdapter(modelId: string): ModelAdapter | null {
             deepseekAdapter = new DeepSeekAdapter();
         }
         return deepseekAdapter;
+    }
+    
+    if (model.provider === 'kimi') {
+        if (!kimiAdapter) {
+            kimiAdapter = new KimiAdapter();
+        }
+        return kimiAdapter;
     }
     
     return null;

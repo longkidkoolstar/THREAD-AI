@@ -22,6 +22,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(({ onSend, dis
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const recognitionRef = useRef<any>(null);
+    const stopListeningRef = useRef(false);
 
     useImperativeHandle(ref, () => ({
         setText: (newText: string) => setText(newText)
@@ -76,10 +77,14 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(({ onSend, dis
 
     const toggleSpeech = () => {
         if (isListening) {
+            stopListeningRef.current = true; // Signal to stop listening
             recognitionRef.current?.stop();
+            setIsListening(false);
             return;
         }
 
+        stopListeningRef.current = false; // Reset stop flag
+        
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         if (!SpeechRecognition) {
             alert("Speech recognition is not supported in this browser.");
@@ -88,13 +93,24 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(({ onSend, dis
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
-        recognition.interimResults = false;
+        recognition.continuous = true; // Keep listening through pauses
+        recognition.interimResults = true; // Get interim results for real-time feedback
         recognition.maxAlternatives = 1;
+
+        let lastResultIndex = -1; // Track processed results to avoid duplicates
 
         recognition.onstart = () => setIsListening(true);
         recognition.onend = () => {
-            setIsListening(false);
-            recognitionRef.current = null;
+            // Only truly stop if user clicked the stop button
+            // Otherwise, restart to keep listening through pauses
+            if (!stopListeningRef.current && recognitionRef.current === recognition) {
+                recognition.start();
+            } else {
+                setIsListening(false);
+                if (recognitionRef.current === recognition) {
+                    recognitionRef.current = null;
+                }
+            }
         };
         recognition.onerror = (event: any) => {
             // Ignore aborted error as it often happens when stopping manually
@@ -103,8 +119,14 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(({ onSend, dis
             setIsListening(false);
         };
         recognition.onresult = (event: any) => {
-            const transcript = event.results[0][0].transcript;
-            setText(prev => prev + (prev ? ' ' : '') + transcript);
+            // Only process new final results to avoid duplicates
+            for (let i = lastResultIndex + 1; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+                    const transcript = event.results[i][0].transcript;
+                    setText(prev => prev + (prev ? ' ' : '') + transcript);
+                    lastResultIndex = i;
+                }
+            }
         };
 
         recognitionRef.current = recognition;
